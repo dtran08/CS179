@@ -1,0 +1,45 @@
+CS 193: Design Project
+Spring 2019
+Instructor: Christian Shelton
+
+Syllabus
+--------
+
+This offering of CS 193 focuses on the design and implementation of
+visualization software for medical databases.  The final project will
+consist of 1) software to allow for the visualization of collections
+of medical records, particularly from intensive care units, and 2)
+documentation of the software for users of the software and programmers
+who might extend the software.
+
+The week-by-week schedule is planned to be as follows.
+
+Week 1-2: Research and review of existing visualization software*
+	   Selection of a framework/platform to build on
+Week 3: Identification of type of visualization desired.
+	      Mock-up of desired tool.*
+Week 4-6: Initial implementation
+Week 7: Demonstration of first version*
+Week 8-9: Generation of final version
+		Writing of documentation
+Week 10: Review and final feedback on software and documentation
+Finals Week: Demonstration and full review of software and documentation*
+
+Items with *s will be graded, with the following weights toward the final grade:
+
+Existing tool research: 15%
+Mock-up: 15%
+First version: 20%
+Final documentation: 20%
+Final version: 30%
+
+Time will be spent in (a) weekly one-on-one meetings with the instructor
+to review current progress and assess work to be completed over the next
+week, (b) research on the tools, software, and visualization frameworks
+upon which this project will be built, both explicitly during the initial
+weeks, and during subsequent weeks to revisit and find information for
+the particular tool being designed, (c) implementing the software, and
+(d) writing the documentation.
+
+It is expected this will take roughly 12 hours per week per student,
+translating to 4 units of credit.
