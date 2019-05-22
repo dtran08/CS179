@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <!-- canvasJS -->
+    <script src="canvasjs-2.3.1/canvasjs.min.js"></script>
+    <script type="text/javascript">
+      window.onload = function () {
+          var chart = new CanvasJS.Chart("chartContainer", {
+              data: [
+              {
+                  type: "line",
+                  dataPoints: [
+                  { x: 10, y: 10 },
+                  { x: 20, y: 15 },
+                  { x: 30, y: 25 },
+                  { x: 40, y: 30 },
+                  { x: 50, y: 28 }
+                  ]
+              }
+              ]
+          });
+
+          chart.render();
+      }
+    </script>
+  </head>
+  <body>
+    <!-- Patient History -->
+    <div class="container">
+      <div class="row">
+        <!-- Patient ID and Date Effective -->
+        <div class="col-sm">
+          <p>
+            Patient ID: lmao <br>
+            Date Effective: lmao
+          </p>
+        </div>
+
+        <!-- Diagnoses -->
+        <div class="col-sm">
+          <p>
+            Diagnoses:
+          </p>
+        </div>
+
+        <!-- Treatments -->
+        <div class="col-sm">
+          <p>
+            Treatments:
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- graphs and stuff lol -->
+    <div class="container">
+      <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+    </div>
+
+
+  </body>
+</html>
