@@ -1,0 +1,153 @@
+<!-- IMPORTANT: YOU MUST HAVE THE CSV FILE LOCAL TO THIS FOLDER, IT WILL NOT WORK ON ITS OWN -->
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
+<script src="jquery-csv.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<!-- <script>
+	d3.csv("41.csv", function(d) {
+		// console.log(data[4]);
+		// data.forEach(function(d) {
+		// 	d.VALUE = +d.VALUE;
+		// 	d[""]
+		// })
+		return {
+			SUBJECT_ID: d.SUBJECT_ID,
+			ITEM_ID: d.ITEM_ID,
+			CHARTTIME: d.CHARTTIME,
+			CGID: d.CGID,
+			VALUE: d.VALUE,
+		};
+	}).then(function(data) {
+		console.log(data[4]);
+		// for(var i = 0; i < data.length; i++) {
+		// 	if()
+		// }
+	});
+</script> -->
+
+<script type="text/javascript">
+$(document).ready(function () {
+var tempSet = [];
+    $.ajax({
+        type: "GET",
+        url: "16.csv",
+        dataType: "text",
+        success: function (data) { processData(data); }
+    });
+	d3.csv("41.csv", function(d) {
+		// console.log(data[4]);
+		// data.forEach(function(d) {
+		// 	d.VALUE = +d.VALUE;
+		// 	d[""]
+		// })
+		return {
+			SUBJECT_ID: d.SUBJECT_ID,
+			ITEM_ID: d.ITEM_ID,
+			CHARTTIME: d.CHARTTIME,
+			CGID: d.CGID,
+			VALUE: d.VALUE,
+		};
+	}).then(function(data) {
+		console.log(data[4]);
+		for(var j = 0; j < data.length; j++){
+			if(data[i].ITEM_ID == 3654) {
+				tempSet.push(data[i].VALUE);
+			}
+		}		
+	});
+
+
+
+    function processData(allText) {
+        var allLinesArray = allText.split('\n');
+        if (allLinesArray.length > 0) {
+            var dataPoints = [];
+            //var setOfTemp = [];                                 
+            for(var j = 0; j <= allLinesArray.length-1; j++){
+            	var rowData1 = allLinesArray[j].split(',');
+            	// if(rowData1[4] == "3654") {
+            	// 	setOfTemp.push(rowData1[8][14]);
+            	// }
+            }
+
+            //FIX THIS ONE
+            for (var i = 1; i <= allLinesArray.length - 1; i++) {
+		        var rowData = allLinesArray[i].split(',');
+		        if(rowData && rowData.length > 1) {
+		            dataPoints.push({ label: rowData[4], y: parseInt(rowData[4]) }); //put in row data at col 8 (the numbers)
+		        }
+		        }
+	            chart.options.data[0].dataPoints = dataPoints;
+	            chart.render();
+	        }
+    }
+
+            
+    var chart = new CanvasJS.Chart("chartContainer", {
+        theme: "light2",
+        animationEnabled: true,
+        zoomEnabled: true,
+        title: {
+            text: "Patient 16"//<?php echo 'Patient 16', data[0].SUBJECT_ID;?>
+        },
+        data: [
+        {
+            type: "area",
+            dataPoints: []
+        }
+        ]
+    });
+            
+});
+</script>
+<!-- <script type="text/javascript">
+$(document).ready(function () {
+
+    $.ajax({
+        type: "GET",
+        url: "16.csv",
+        dataType: "text",
+        success: function (data) { processData(data); }
+    });
+    function processData(allText) {
+        var allLinesArray = allText.split('\n');
+        if (allLinesArray.length > 0) {
+            var dataPoints = [];
+            var setOfTemp = [];
+
+
+            for (var i = 1; i <= allLinesArray.length - 1; i++) {
+		        var rowData = allLinesArray[i].split(',');
+		        var unique = rowData.filter(function(itm, i, a) {
+		        	return i == rowData.indexOf(itm);
+		        });		        
+		        if(rowData && rowData.length > 1) {
+		            dataPoints.push({ label: rowData[7], y: rowData[7].length }); //put in row data at col 8 (the numbers)
+		        }
+		        }
+	            chart.options.data[0].dataPoints = dataPoints;
+	            chart.render();
+	        }
+    }  
+    var chart = new CanvasJS.Chart("chartContainer", {
+    	theme: "light2",
+    	title: {
+    		text: "Caregiver List"
+    	},
+    	data: [
+    	{
+    		type: "column",
+    		dataPoints2: []
+    	}
+    	]
+    }
+    );      
+</script> -->
+<script type="text/javascript" src="canvasjs.min.js"></script>
+</head>
+<body>
+<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+</body>
+</html>
