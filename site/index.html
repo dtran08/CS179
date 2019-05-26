@@ -26,8 +26,8 @@ var tempSet = [];
 	}).then(function(data) { //dot property calls apply to each data line
 		console.log(data[11]); //for testing purposes
 		for(var j = 0; j < data.length; j++){
-			if(data[i].ITEMID == "3654") {
-				tempSet.push(data[i].VALUE);
+			if(data[j].ITEMID == "3654") {
+				tempSet.push(data[j].VALUE);
 			}//loop through data, if its ITEMID is what we want then push an array for data
 		}		
 	});
