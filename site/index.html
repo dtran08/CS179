@@ -4,57 +4,31 @@
 <head>
 <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
 <script src="jquery-csv.js"></script>
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<!-- <script>
-	d3.csv("41.csv", function(d) {
-		// console.log(data[4]);
-		// data.forEach(function(d) {
-		// 	d.VALUE = +d.VALUE;
-		// 	d[""]
-		// })
-		return {
-			SUBJECT_ID: d.SUBJECT_ID,
-			ITEM_ID: d.ITEM_ID,
-			CHARTTIME: d.CHARTTIME,
-			CGID: d.CGID,
-			VALUE: d.VALUE,
-		};
-	}).then(function(data) {
-		console.log(data[4]);
-		// for(var i = 0; i < data.length; i++) {
-		// 	if()
-		// }
-	});
-</script> -->
-
+<script src="https://d3js.org/d3.v5.min.js"></script>  <!-- include d3 lib -->
 <script type="text/javascript">
 $(document).ready(function () {
 var tempSet = [];
-    $.ajax({
+    $.ajax({//ajax call, will remove later
         type: "GET",
         url: "16.csv",
         dataType: "text",
         success: function (data) { processData(data); }
     });
-	d3.csv("41.csv", function(d) {
-		// console.log(data[4]);
-		// data.forEach(function(d) {
-		// 	d.VALUE = +d.VALUE;
-		// 	d[""]
-		// })
+
+	d3.csv("16.csv", function(d) { //call d3 to read in csv file on a dot property d
 		return {
-			SUBJECT_ID: d.SUBJECT_ID,
-			ITEM_ID: d.ITEM_ID,
+			SUBJECT_ID: d.SUBJECT_ID, //accessor preferences
+			ITEMID: d.ITEMID,
 			CHARTTIME: d.CHARTTIME,
 			CGID: d.CGID,
 			VALUE: d.VALUE,
 		};
-	}).then(function(data) {
-		console.log(data[4]);
+	}).then(function(data) { //dot property calls apply to each data line
+		console.log(data[11]); //for testing purposes
 		for(var j = 0; j < data.length; j++){
-			if(data[i].ITEM_ID == 3654) {
+			if(data[i].ITEMID == "3654") {
 				tempSet.push(data[i].VALUE);
-			}
+			}//loop through data, if its ITEMID is what we want then push an array for data
 		}		
 	});
 
