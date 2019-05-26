@@ -7,9 +7,25 @@
 
     <!-- canvasJS -->
     <script src="canvasjs-2.3.1/canvasjs.min.js"></script>
+
+    <!-- d3 for parsing -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+
     <script type="text/javascript">
       window.onload = function () {
-          var chart = new CanvasJS.Chart("chartContainer", {
+          var chart = new CanvasJS.Chart("chartContainer",
+          {
+              zoomEnabled: true,
+              title:{
+                text: "Try Zooming And Panning"
+              },
+              legend: {
+                horizontalAlign: "right",
+                verticalAlign: "center"
+              },
+              axisY:{
+                includeZero: false
+              },
               data: [
               {
                   type: "line",
@@ -34,24 +50,25 @@
       <div class="row">
         <!-- Patient ID and Date Effective -->
         <div class="col-sm">
-          <p>
-            Patient ID: lmao <br>
-            Date Effective: lmao
-          </p>
+          <h2>
+            Patient ID
+          </h2>
+          <!-- retrieves DOB and DOD's -->
+          <ul id="get-dates"></ul>
         </div>
 
         <!-- Diagnoses -->
         <div class="col-sm">
-          <p>
-            Diagnoses:
-          </p>
+          <h2>Diagnoses</h2>
+          <!-- retrieves all diagnoses -->
+          <ul id="get-diagnoses"></ul>
         </div>
 
         <!-- Treatments -->
         <div class="col-sm">
-          <p>
-            Treatments:
-          </p>
+          <h2>Treatments</h2>
+          <!-- retrieves all diagnoses -->
+          <ul id="get-treatments"></ul>
         </div>
       </div>
     </div>
