@@ -1,127 +1,221 @@
-<!-- IMPORTANT: YOU MUST HAVE THE CSV FILE LOCAL TO THIS FOLDER, IT WILL NOT WORK ON ITS OWN -->
+<!-- IMPORTANT: YOU MUST HAVE THE CSV DATABASE LOCAL TO THIS FOLDER, IT WILL NOT WORK ON ITS OWN -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="utf-8"/>
+<title>Profile</title>
 <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
-<script src="jquery-csv.js"></script>
+<!-- <script src="jquery-csv.js"></script> -->
 <script src="https://d3js.org/d3.v5.min.js"></script>  <!-- include d3 lib -->
-<script type="text/javascript">
+<script src="https://d3js.org/d3-time.v1.min.js"></script>
+<script src="https://d3js.org/d3-time-format.v2.min.js"></script>
+<script type="text/javascript" src="canvasjs.min.js"></script>
+<script>
+    var format = d3.timeFormat("%x");
+</script>
+<script src="https://d3js.org/d3-selection.v1.min.js"></script>
+<script>
+
+const div = d3.selectAll("div");
+
+</script>
+
+<script type="text/javascript">    
 $(document).ready(function () {
-var tempSet = [];
-    $.ajax({//ajax call, will remove later
-        type: "GET",
-        url: "16.csv",
-        dataType: "text",
-        success: function (data) { processData(data); }
-    });
+    var dataPoints = [];
+    var dataPoints2 = [];
+    var dataPoints3 = []; 
+    var caregiverList = [];
+    var completeDates = [];
+    var tempSet = [];
+    var tempSetTimes = [];
+    var tempSet2 = [];
+    var tempSetTimes2 = [];
+    // Array.prototype.contains = function(v) {
+    //     for(var i = 0; i < this.length; i++) {
+    //         if(this[i] === v) return true;
+    //     }
+    //     return false;
+    // };
 
-	d3.csv("16.csv", function(d) { //call d3 to read in csv file on a dot property d
-		return {
-			SUBJECT_ID: d.SUBJECT_ID, //accessor preferences
-			ITEMID: d.ITEMID,
-			CHARTTIME: d.CHARTTIME,
-			CGID: d.CGID,
-			VALUE: d.VALUE,
-		};
-	}).then(function(data) { //dot property calls apply to each data line
-		console.log(data[11]); //for testing purposes
-		for(var j = 0; j < data.length; j++){
-			if(data[j].ITEMID == "3654") {
-				tempSet.push(data[j].VALUE);
-			}//loop through data, if its ITEMID is what we want then push an array for data
-		}		
-	});
+    // Array.prototype.unique = function() {
+    //     var arr = [];
+    //     for(var i = 0; i < this.length; i++) {
+    //         if(!arr.includes(this[i])) {
+    //             arr.push(this[i]);
+    //         }
+    //     }
+    //     return arr; 
+    // }        
+        d3.csv("35.csv", function(d) { //call d3 to read in csv file on a dot property d
+            return {
+                SUBJECT_ID: +d.SUBJECT_ID, //accessor preferences
+                ITEMID: +d.ITEMID,
+                CHARTTIME: d.CHARTTIME,
+                CGID: +d.CGID,
+                VALUE: +d.VALUE,
+            };
+        }).then(function(data) { //dot property calls apply to each data line
+            // console.log(data[11]); //for testing purposes
+            for(var j = 0; j < data.length; j++){
+                if(data[j].ITEMID == 211) {
+                    tempSet.push(data[j].VALUE);
+                    // patientID.push(data[j].SUBJECT_ID);
 
+                    var s = data[j].CHARTTIME;
+                    var d = new Date(s);
+                    // console.log(d);
+                    tempSetTimes.push(d);
 
+                }//loop through data, if its ITEMID is what we want then push an array for data
+                if(data[j].ITEMID == 52) {
+                    tempSet2.push(data[j].VALUE);
 
-    function processData(allText) {
-        var allLinesArray = allText.split('\n');
-        if (allLinesArray.length > 0) {
-            var dataPoints = [];
-            //var setOfTemp = [];                                 
-            for(var j = 0; j <= allLinesArray.length-1; j++){
-            	var rowData1 = allLinesArray[j].split(',');
-            	// if(rowData1[4] == "3654") {
-            	// 	setOfTemp.push(rowData1[8][14]);
-            	// }
+                    var s2 = data[j].CHARTTIME;
+                    var d2 = new Date(s2);
+                    tempSetTimes2.push(d2);
+                }
+                var sTot = data[j].CHARTTIME;
+                var dTot = new Date(sTot);
+                completeDates.push(dTot);
+                caregiverList.push(data[j].CGID);
             }
+            // var uniqueCaregivers = caregiverList.unique();
+            // console.log(uniqueCaregivers.length);
 
-            //FIX THIS ONE
-            for (var i = 1; i <= allLinesArray.length - 1; i++) {
-		        var rowData = allLinesArray[i].split(',');
-		        if(rowData && rowData.length > 1) {
-		            dataPoints.push({ label: rowData[4], y: parseInt(rowData[4]) }); //put in row data at col 8 (the numbers)
-		        }
-		        }
-	            chart.options.data[0].dataPoints = dataPoints;
-	            chart.render();
-	        }
-    }
 
-            
+            for(var h = 0; h < tempSet.length; h++) {
+                dataPoints.push({ x: tempSetTimes[h], y: tempSet[h] });
+                // console.log(tempSetTimes[h]);
+            }
+            for(var h2 = 0; h2 < tempSet2.length; h2++) {
+                dataPoints2.push({ x: tempSetTimes2[h2], y: tempSet2[h2] });
+            }
+            for(var h3 = 0; h3 < caregiverList.length; h3++) {
+                dataPoints3.push({ x: completeDates[h3], y: caregiverList[h3] });
+            }
+            dataPoints.sort(function(o, p) {
+                return o.x-p.x;
+            })
+            dataPoints2.sort(function(o2, p2) {
+                return o2.x-p2.x;
+            })
+            dataPoints3.sort(function(o3, p3) {
+                return o3.x-p3.x;
+            })
+        });
+
+
     var chart = new CanvasJS.Chart("chartContainer", {
         theme: "light2",
         animationEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Patient 16"//<?php echo 'Patient 16', data[0].SUBJECT_ID;?>
+            text: "Patient X BPM+mmhg"//<?php echo 'Patient 16', data[0].SUBJECT_ID;?>
+        },
+        axisX: {
+            intervalType: "minute",
+            valueFormatString: "YYYY-MM-DD, HH:mm:ss",
+            labelMaxWidth: 100,
+        },
+        axisY: {
         },
         data: [
         {
-            type: "area",
-            dataPoints: []
+            type: "line",
+            showInLegend: true,
+            name: "series1",
+            legendText: "Heart Rate",
+            dataPoints: dataPoints
+        },
+        {
+            type: "line",
+            showInLegend: true,
+            name: "series2",
+            legendText: "Blood Pressure",
+            dataPoints: dataPoints2
         }
         ]
     });
-            
+    chart.render();
+
+    var chart = new CanvasJS.Chart("chartContainer2", {
+        theme: "light2",
+        animationEnabled: true,
+        zoomEnabled: true,
+        title: {
+            text: "Patient X Caregivers"
+        },
+        axisX: {
+            intervalType: "minute",
+            valueFormatString: "YYYY-MM-DD, HH:mm:ss",
+            labelMaxWidth: 100,
+        },
+        axisY: {
+            label: "Caregivers"
+        },
+        data: [
+        {
+            type: "stepLine",
+            lineThickness: 2,
+            dataPoints: dataPoints3
+        }
+        ]
+    });
+    chart.render();
+
+
 });
 </script>
-<!-- <script type="text/javascript">
-$(document).ready(function () {
-
-    $.ajax({
-        type: "GET",
-        url: "16.csv",
-        dataType: "text",
-        success: function (data) { processData(data); }
-    });
-    function processData(allText) {
-        var allLinesArray = allText.split('\n');
-        if (allLinesArray.length > 0) {
-            var dataPoints = [];
-            var setOfTemp = [];
-
-
-            for (var i = 1; i <= allLinesArray.length - 1; i++) {
-		        var rowData = allLinesArray[i].split(',');
-		        var unique = rowData.filter(function(itm, i, a) {
-		        	return i == rowData.indexOf(itm);
-		        });		        
-		        if(rowData && rowData.length > 1) {
-		            dataPoints.push({ label: rowData[7], y: rowData[7].length }); //put in row data at col 8 (the numbers)
-		        }
-		        }
-	            chart.options.data[0].dataPoints = dataPoints;
-	            chart.render();
-	        }
-    }  
-    var chart = new CanvasJS.Chart("chartContainer", {
-    	theme: "light2",
-    	title: {
-    		text: "Caregiver List"
-    	},
-    	data: [
-    	{
-    		type: "column",
-    		dataPoints2: []
-    	}
-    	]
-    }
-    );      
-</script> -->
 <script type="text/javascript" src="canvasjs.min.js"></script>
+    <style type="text/css"> 
+        body {
+            margin-left: 4%;
+            margin-right: 4%;
+        }
+        table {
+            border-collapse: collapse;
+            border: 2px #000 solid;
+        }
+        th {
+            border: 1px #F00 solid;
+            text-align: center;
+            font-weight: bold;
+        }
+        td {
+            border: 1px #00F solid;
+            text-align: center;
+            padding: 5px;
+        }
+    </style>
 </head>
 <body>
-<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+    <script type="text/javascript">
+        d3.text("35.csv", function (datasetText) {
+            var rows = d3.csv.parseRows(datasetText);
+            var tbl = d3.select("basic")
+                .append("table");
+
+            tbl.append("thead").append("tr")
+                .selectAll("th")
+                .data(rows[2])
+                .enter().append("th")
+                .text(function(d) {
+                    return d;
+                });
+
+            tbl.append("tbody")
+                .selectAll("tr").data(rows.slice(1))
+                .enter().append("tr")
+
+                .selectAll("td")
+                .data(function(d){return d;})
+                .enter().append("td")
+                .text(function(d){return d;})
+        });
+    </script>
+    <div id="chartContainer" style="height: 500px; width: 100%;"></div>
+    <div id="chartContainer2" style="height: 500px; width: 100%;"></div>
+    <div id="basic"></div>
 </body>
 </html>
