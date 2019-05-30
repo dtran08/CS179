@@ -24,29 +24,20 @@ const div = d3.selectAll("div");
 $(document).ready(function () {
     var dataPoints = [];
     var dataPoints2 = [];
-    var dataPoints3 = []; 
+    var dataPoints3 = [];
+    var dataPointsFar = [];
+    var dataPointsCel = [];
     var caregiverList = [];
     var completeDates = [];
     var tempSet = [];
     var tempSetTimes = [];
     var tempSet2 = [];
     var tempSetTimes2 = [];
-    // Array.prototype.contains = function(v) {
-    //     for(var i = 0; i < this.length; i++) {
-    //         if(this[i] === v) return true;
-    //     }
-    //     return false;
-    // };
+    var tempSetFar = [];
+    var tempSetTimesFar = [];
+    var tempSetCel = [];
+    var tempSetTimesCel = [];
 
-    // Array.prototype.unique = function() {
-    //     var arr = [];
-    //     for(var i = 0; i < this.length; i++) {
-    //         if(!arr.includes(this[i])) {
-    //             arr.push(this[i]);
-    //         }
-    //     }
-    //     return arr; 
-    // }        
         d3.csv("35.csv", function(d) { //call d3 to read in csv file on a dot property d
             return {
                 SUBJECT_ID: +d.SUBJECT_ID, //accessor preferences
@@ -75,6 +66,21 @@ $(document).ready(function () {
                     var d2 = new Date(s2);
                     tempSetTimes2.push(d2);
                 }
+                if(data[j].ITEMID == 676) {
+                    tempSetCel.push(data[j].VALUE);
+
+                    var s3 = data[j].CHARTTIME;
+                    var d3 = new Date(s3);
+                    tempSetTimesCel.push(d3);
+                }
+                if(data[j].ITEMID == 679) {
+                    tempSetFar.push(data[j].VALUE);
+
+                    var s4 = data[j].CHARTTIME;
+                    var d4 = new Date(s4);
+                    tempSetTimesFar.push(d4);
+                }
+
                 var sTot = data[j].CHARTTIME;
                 var dTot = new Date(sTot);
                 completeDates.push(dTot);
@@ -94,6 +100,12 @@ $(document).ready(function () {
             for(var h3 = 0; h3 < caregiverList.length; h3++) {
                 dataPoints3.push({ x: completeDates[h3], y: caregiverList[h3] });
             }
+            for(var h4 = 0; h4 < tempSetCel.length; h4++) {
+                dataPointsCel.push({ x: tempSetTimesCel[h4], y: tempSetCel[h4] });
+            }    
+            for(var h5 = 0; h5 < tempSetFar.length; h5++) {
+                dataPointsFar.push({ x: tempSetTimesFar[h5], y: tempSetFar[h5] });
+            }                       
             dataPoints.sort(function(o, p) {
                 return o.x-p.x;
             })
@@ -103,16 +115,36 @@ $(document).ready(function () {
             dataPoints3.sort(function(o3, p3) {
                 return o3.x-p3.x;
             })
+            dataPointsCel.sort(function(o4, p4) {
+                return o4.x-p4.x;
+            })
+            dataPointsFar.sort(function(o5, p5) {
+                return o5.x-p5.x;
+            })                        
         });
 
-
-    var chart = new CanvasJS.Chart("chartContainer", {
+window.onload = function () {
+        var chart = new CanvasJS.Chart("chartContainer", {
         theme: "light2",
         animationEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Patient X BPM+mmhg"//<?php echo 'Patient 16', data[0].SUBJECT_ID;?>
+            text: "Patient X General Measurements"//<?php echo 'Patient 16', data[0].SUBJECT_ID;?>
         },
+        legend: {
+                    cursor: "pointer",
+                    itemclick: function (e) {
+                        //console.log("legend click: " + e.dataPointIndex);
+                        //console.log(e);
+                        if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                            e.dataSeries.visible = false;
+                        } else {
+                            e.dataSeries.visible = true;
+                        }
+         
+                        e.chart.render();
+                    }
+                },
         axisX: {
             intervalType: "minute",
             valueFormatString: "YYYY-MM-DD, HH:mm:ss",
@@ -125,19 +157,46 @@ $(document).ready(function () {
             type: "line",
             showInLegend: true,
             name: "series1",
-            legendText: "Heart Rate",
+            legendText: "Heart Rate (BPM)",
+            connectNullData: true,
+            markerType: "circle",
+            markerSize: 5,
             dataPoints: dataPoints
         },
         {
             type: "line",
             showInLegend: true,
             name: "series2",
-            legendText: "Blood Pressure",
+            legendText: "Blood Pressure (mmHG)",
+            connectNullData: true,
+            markerType: "circle",
+            markerSize: 5,
             dataPoints: dataPoints2
+        },
+        {
+            type: "line",
+            showInLegend: true,
+            name: "series3",
+            legendText: "Temperature (C)",
+            connectNullData: true,
+            markerType: "circle",
+            markerSize: 5,
+            dataPoints: dataPointsCel
+        },
+        {
+            type: "line",
+            showInLegend: true,
+            name: "series4",
+            legendText: "Temperature (F)",
+            connectNullData: true,
+            markerType: "circle",
+            markerSize: 5,
+            dataPoints: dataPointsFar            
         }
         ]
     });
     chart.render();
+}
 
     var chart = new CanvasJS.Chart("chartContainer2", {
         theme: "light2",
@@ -158,6 +217,8 @@ $(document).ready(function () {
         {
             type: "stepLine",
             lineThickness: 2,
+            markerType: "circle",
+            markerSize: 4,            
             dataPoints: dataPoints3
         }
         ]
@@ -168,7 +229,7 @@ $(document).ready(function () {
 });
 </script>
 <script type="text/javascript" src="canvasjs.min.js"></script>
-    <style type="text/css"> 
+<!--     <style type="text/css"> 
         body {
             margin-left: 4%;
             margin-right: 4%;
@@ -187,33 +248,9 @@ $(document).ready(function () {
             text-align: center;
             padding: 5px;
         }
-    </style>
+    </style> -->
 </head>
 <body>
-    <script type="text/javascript">
-        d3.text("35.csv", function (datasetText) {
-            var rows = d3.csv.parseRows(datasetText);
-            var tbl = d3.select("basic")
-                .append("table");
-
-            tbl.append("thead").append("tr")
-                .selectAll("th")
-                .data(rows[2])
-                .enter().append("th")
-                .text(function(d) {
-                    return d;
-                });
-
-            tbl.append("tbody")
-                .selectAll("tr").data(rows.slice(1))
-                .enter().append("tr")
-
-                .selectAll("td")
-                .data(function(d){return d;})
-                .enter().append("td")
-                .text(function(d){return d;})
-        });
-    </script>
     <div id="chartContainer" style="height: 500px; width: 100%;"></div>
     <div id="chartContainer2" style="height: 500px; width: 100%;"></div>
     <div id="basic"></div>
