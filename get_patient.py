@@ -63,7 +63,7 @@ with open("data/CLEANED_CHARTEVENTS.csv") as f:
                 firstLine = True
             if row[1] == subject_id:
                 with open(subject_id + '.csv', 'a') as patient_doc:
-                    writer = csv.writer(curr_doc, lineterminator='\n')
+                    writer = csv.writer(patient_doc, lineterminator='\n')
                     writer.writerow(row)
 
     else:

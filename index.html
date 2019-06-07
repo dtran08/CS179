@@ -12,6 +12,10 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
 
     <script type="text/javascript">
+      d3.csv("data/35.csv", function(data) {
+        console.log(data);
+      });
+
       window.onload = function () {
           var chart = new CanvasJS.Chart("chartContainer",
           {
