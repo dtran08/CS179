@@ -1,87 +1,680 @@
-<!DOCTYPE HTML>
-<html>
-  <head>
-    <!-- bootstrap -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<!-- IMPORTANT: YOU MUST HAVE THE CSV DATABASE LOCAL TO THIS FOLDER, IT WILL NOT WORK ON ITS OWN -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Profile</title>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
+<!-- <script src="jquery-csv.js"></script> -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>  <!-- include d3 lib -->
+<script src="https://d3js.org/d3-time.v1.min.js"></script>
+<script src="https://d3js.org/d3-time-format.v2.min.js"></script>
+<script type="text/javascript" src="canvasjs-2.3.1/canvasjs.min.js"></script>
+<script>
+    var format = d3.timeFormat("%x");
+</script>
+<script src="https://d3js.org/d3-selection.v1.min.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script>
 
-    <!-- canvasJS -->
-    <script src="canvasjs-2.3.1/canvasjs.min.js"></script>
+const div = d3.selectAll("div");
 
-    <!-- d3 for parsing -->
-    <script src="https://d3js.org/d3.v5.min.js"></script>
+</script>
 
-    <script type="text/javascript">
-      d3.csv("data/35.csv", function(data) {
-        console.log(data);
-      });
+<script type="text/javascript">    
+$(document).ready(function () {
+    var dataPoints = [];
+    var dataPoints2 = [];
+    var dataPoints3 = [];
+    var dataPoints4 = [];
+    var dataPointsFar = [];
+    var dataPointsCel = [];
+    var dataPoints5 = [];
+    var dataPoints6 = [];
 
-      window.onload = function () {
-          var chart = new CanvasJS.Chart("chartContainer",
-          {
-              zoomEnabled: true,
-              title:{
-                text: "Try Zooming And Panning"
-              },
-              legend: {
-                horizontalAlign: "right",
-                verticalAlign: "center"
-              },
-              axisY:{
-                includeZero: false
-              },
-              data: [
-              {
-                  type: "line",
-                  dataPoints: [
-                  { x: 10, y: 10 },
-                  { x: 20, y: 15 },
-                  { x: 30, y: 25 },
-                  { x: 40, y: 30 },
-                  { x: 50, y: 28 }
-                  ]
-              }
-              ]
-          });
+    var caregiverList = [];
+    var completeDates = [];
 
-          chart.render();
-      }
-    </script>
-  </head>
-  <body>
-    <!-- Patient History -->
-    <div class="container">
-      <div class="row">
-        <!-- Patient ID and Date Effective -->
-        <div class="col-sm">
-          <h2>
-            Patient ID
-          </h2>
-          <!-- retrieves DOB and DOD's -->
-          <ul id="get-dates"></ul>
-        </div>
+    var tempSet = [];
+    var tempSetTimes = [];
+    var tempSet2 = [];
+    var tempSetTimes2 = [];
+    var tempSetFar = [];
+    var tempSetTimesFar = [];
+    var tempSetCel = [];
+    var tempSetTimesCel = [];
+    var tempSet4 = [];
+    var tempSetTimes4 = [];
+    var tempSet5 = [];
+    var tempSetTimes5 = [];
+    var tempSet6 = [];
+    var tempSetTimes6 = [];
 
-        <!-- Diagnoses -->
-        <div class="col-sm">
-          <h2>Diagnoses</h2>
-          <!-- retrieves all diagnoses -->
-          <ul id="get-diagnoses"></ul>
-        </div>
+    var caregiverPoints = [];
 
-        <!-- Treatments -->
-        <div class="col-sm">
-          <h2>Treatments</h2>
-          <!-- retrieves all diagnoses -->
-          <ul id="get-treatments"></ul>
-        </div>
-      </div>
-    </div>
+    var drugPoints = [];
+    var subjID;
+    var hadmID;
+    var icustayID;
+    var drugUnit;
+    var drugName;
 
-    <!-- graphs and stuff lol -->
-    <div class="container">
-      <div id="chartContainer" style="height: 300px; width: 100%;"></div>
-    </div>
+    var itemIDArray = [];
+    var incr = 0;
+
+    var mincgid;
+    var maxcgid;
+    var cgidreassign = [];
+    var cgidreassignloc = [];
+
+    function itemProf(item, value, cgid, hadm, icustay, charttime) {
+        this.ITEM_ID = item;
+        this.VALUE = value;
+        this.CGID = cgid;
+        this.HADM_ID = hadm;
+        this.CHARTTIME = charttime;
+    }
 
 
-  </body>
+    d3.csv(csvFile, function(d) { //call d3 to read in csv file on a dot property d
+        // if(!error) {
+        //     console.log("File not found!");
+        // }
+        return {
+            SUBJECT_ID: +d.SUBJECT_ID, //accessor preferences
+            ITEMID: +d.ITEMID,
+            CHARTTIME: d.CHARTTIME,
+            CGID: +d.CGID,
+            HADM_ID: +d.HADM_ID,
+            VALUE: +d.VALUE,
+            ICUSTAY_ID: +d.ICUSTAY_ID,
+        };
+    }).then(function(data) { 
+
+        //begin dynamic graphing
+        //acquires every single itemid and SEPARATES them into a 2d array
+        //determine is n is a float or int, if both then we need it for the itemids
+        // function isFloat(n) {
+        //     return n === +n && n !== (n|0);
+        // }
+        // function isInt(n) {
+        //     return n === +n && n === (n|0);
+        // }
+        // var incr = [];
+        // for(var ii = 0; ii < data.length; ii++) { //get number of number-type itemids
+        //     if((isFloat(data[ii].VALUE) || isInt(data[ii].VALUE)) && data[ii].VALUE != 0) {
+        //         incr.push(data[ii].ITEMID);
+        //     }
+        // }
+        // console.log(incr);
+        // var distinct = incr.filter(function(item, index, inputArray) {
+        //     return inputArray.indexOf(item) == index;
+        // });
+        // console.log(distinct);
+        // for(itr = 0; itr < distinct.length; itr++) {
+        //     itemIDArray.push([]);
+        //     dataPoints.push([]);
+        //     tempSet.push([]);
+        //     tempSetTimes.push([]);
+        // }
+        // console.log(itemIDArray);
+
+        // for(var k = 0; k < distinct.length; k++) {
+        //     for(var k2 = 0; k2 < data.length; k2++) {
+        //         if(data[k2].ITEMID == distinct[k]) {
+        //             itemIDArray[k].push(new itemProf(data[k2].ITEMID, data[k2].VALUE, data[k2].CGID, data[k2].HADM_ID, data[k2].ICUSTAY_ID, data[k2].CHARTTIME));
+        //         }
+        //     }
+        // }
+        // console.log(itemIDArray.length);
+        // console.log(dataPoints.length);
+        // console.log(itemIDArray[0]);
+
+        //UNFINISHED, BUT COULD POTENTIALLY RE-IMPLEMENT: dynamic graphing per itemid
+       // for(var k3 = 0; k3 < itemIDArray.length; k3++) {
+       //      for(var j = 0; j < itemIDArray[0].length; k++) {
+       //          tempSet[k3].push(itemIDArray[k3].VALUE);
+       //          var s = data[j].CHARTTIME;
+       //          var d = new Date(s);
+       //          tempSetTimes[k3].push(d);
+       //      }
+       // }
+       //end dynamic graphing
+
+        //cgid stuff start
+        for(var j = 0; j < data.length; j++) {
+            var sTot = data[j].CHARTTIME;
+            var dTot = new Date(sTot);
+            completeDates.push(dTot);
+            caregiverList.push(data[j].CGID);            
+        }
+        function unique(value, index, self) {
+            return self.indexOf(value) === index;
+        }
+        cgidreassign = caregiverList.filter(unique);
+
+        var arrnames = [];
+        for(var cgids = 0; cgids < cgidreassign.length; cgids++) {
+            arrnames.push(faker.fake("{{name.firstName}} {{name.lastName}}"));
+        }
+        // console.log(arrnames);
+        var arrnames2 = [];
+        for(var v = 0; v < caregiverList.length; v++) {
+            for(var v2 = 0; v2 < cgidreassign.length; v2++) {
+                if(caregiverList[v] == cgidreassign[v2]){
+                    caregiverList[v] = v2;
+                    arrnames2.push(arrnames[v2]);
+                }
+            }
+        }
+        mincgid = Math.min(...caregiverList);
+        maxcgid = Math.max(...caregiverList);
+        //cgid stuff end
+
+
+        for(var j = 0; j < data.length; j++){
+            if(data[j].ITEMID == 211) {
+                tempSet.push(data[j].VALUE);
+                // patientID.push(data[j].SUBJECT_ID);
+
+                var s = data[j].CHARTTIME;
+                var d = new Date(s);
+                // console.log(d);
+                tempSetTimes.push(d);
+
+            }//loop through data, if its ITEMID is what we want then push an array for data
+            if(data[j].ITEMID == 52) {
+                tempSet2.push(data[j].VALUE);
+
+                var s2 = data[j].CHARTTIME;
+                var d2 = new Date(s2);
+                tempSetTimes2.push(d2);
+            }
+            if(data[j].ITEMID == 676 && data[j].VALUE != 0) {
+                tempSetCel.push(data[j].VALUE);
+
+                var s3 = data[j].CHARTTIME;
+                var d3 = new Date(s3);
+                tempSetTimesCel.push(d3);
+            }
+            if(data[j].ITEMID == 679 && data[j].VALUE != 0) {
+                tempSetFar.push(data[j].VALUE);
+
+                var s4 = data[j].CHARTTIME;
+                var d4 = new Date(s4);
+                tempSetTimesFar.push(d4);
+            }
+            if(data[j].ITEMID == 618) {
+                tempSet4.push(data[j].VALUE);
+
+                var s5 = data[j].CHARTTIME;
+                var d5 = new Date(s5);
+                tempSetTimes4.push(d5);
+            }
+            if(data[j].ITEMID == 814) {
+                var s6 = data[j].CHARTTIME;
+                var d6 = new Date(s6);
+                tempSetTimes5.push(d6);
+            }
+            if(data[j].ITEMID == 1390) {
+                var s7 = data[j].CHARTTIME;
+                var d7 = new Date(s7);
+                tempSetTimes6.push(d7);
+            }
+        }
+         
+        for(var h = 0; h < tempSet.length; h++) {
+            dataPoints.push({ x: tempSetTimes[h], y: tempSet[h] });
+            // console.log(tempSetTimes[h]);
+        }
+        for(var h2 = 0; h2 < tempSet2.length; h2++) {
+            dataPoints2.push({ x: tempSetTimes2[h2], y: tempSet2[h2] });
+        }
+        for(var h3 = 0; h3 < caregiverList.length; h3++) {
+            dataPoints3.push({ x: completeDates[h3], y: caregiverList[h3], z: arrnames2[h3] });
+        }
+        for(var h4 = 0; h4 < tempSetCel.length; h4++) {
+            dataPointsCel.push({ x: tempSetTimesCel[h4], y: tempSetCel[h4] });
+        }    
+        for(var h5 = 0; h5 < tempSetFar.length; h5++) {
+            dataPointsFar.push({ x: tempSetTimesFar[h5], y: tempSetFar[h5] });
+        }
+        for(var h6 = 0; h6 < tempSet4.length; h6++) {
+            dataPoints4.push({ x: tempSetTimes4[h6], y: tempSet4[h6] });
+        }
+        for(var h7 = 0; h7 < tempSet5.length; h7++) {
+            dataPoints5.push({ x: tempSetTimes5[h7], y: tempSet5[h7] });
+        } 
+        for(var h8 = 0; h8 < tempSet6.length; h8++) {
+            dataPoints6.push({ x: tempSetTimes6[h8], y: tempSet6[h8] });
+        }              
+        dataPoints.sort(function(o, p) {
+            return o.x-p.x;
+        })
+        dataPoints2.sort(function(o2, p2) {
+            return o2.x-p2.x;
+        })
+        dataPoints3.sort(function(o3, p3) {
+            return o3.x-p3.x;
+        })
+
+        console.log(dataPoints3);
+
+        dataPointsCel.sort(function(o4, p4) {
+            return o4.x-p4.x;
+        })
+        dataPointsFar.sort(function(o5, p5) {
+            return o5.x-p5.x;
+        })
+        dataPoints4.sort(function(o6, p6) {
+            return o6.x-p6.x;
+        })
+        dataPoints5.sort(function(o7, p7) {
+            return o7.x-p7.x;
+        })
+        dataPoints6.sort(function(o8, o8) {
+            return o8.x-o8.x;
+        })
+
+        var chart = new CanvasJS.Chart("chartContainer", {
+        theme: "light2",
+        animationEnabled: true,
+        zoomEnabled: true,
+        title: {
+            text: "Patient General Measurements"//<?php echo 'Patient 16', data[0].SUBJECT_ID;?>
+        },
+        legend: {
+                    cursor: "pointer",
+                    itemclick: function (e) {
+                        //console.log("legend click: " + e.dataPointIndex);
+                        //console.log(e);
+                        if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                            e.dataSeries.visible = false;
+                        } else {
+                            e.dataSeries.visible = true;
+                        }
+         
+                        e.chart.render();
+                    }
+                },
+        axisX: {
+            intervalType: "minute",
+            valueFormatString: "YYYY-MM-DD, HH:mm:ss",
+            labelMaxWidth: 100,
+        },
+        axisY: {
+        },
+        data: [
+        {
+            type: "line",
+            showInLegend: true,
+            name: "series1",
+            legendText: "Heart Rate (BPM)",
+            connectNullData: true,
+            markerType: "circle",
+            markerSize: 5,
+            dataPoints: dataPoints
+        },
+        {
+            type: "line",
+            showInLegend: true,
+            name: "series2",
+            legendText: "Blood Pressure (mmHG)",
+            connectNullData: true,
+            markerType: "circle",
+            markerSize: 5,
+            dataPoints: dataPoints2
+        },
+        {
+            type: "line",
+            showInLegend: true,
+            name: "series3",
+            legendText: "Temperature (C)",
+            connectNullData: true,
+            markerType: "circle",
+            markerSize: 5,
+            dataPoints: dataPointsCel
+        },
+        {
+            type: "line",
+            showInLegend: true,
+            name: "series4",
+            legendText: "Temperature (F)",
+            connectNullData: true,
+            markerType: "circle",
+            markerSize: 5,
+            dataPoints: dataPointsFar            
+        },
+        {
+            type: "line",
+            showInLegend: true,
+            name: "series5",
+            legendText: "Respiratory Rate (BPM)",
+            connectNullData: true,
+            markerType: "circle",
+            markerSize: 5,
+            dataPoints: dataPoints4               
+        },
+        {
+            type: "line",
+            showInLegend: true,
+            name: "series6",
+            legendText: "Hemoglobin (gm/dl)",
+            connectNullData: true,
+            markerType: "circle",
+            markerSize: 5,
+            dataPoints: dataPoints5               
+        },    
+        {
+            type: "line",
+            showInLegend: true,
+            name: "series7",
+            legendText: "Delivered Oxygen (ml/min)",
+            connectNullData: true,
+            markerType: "circle",
+            markerSize: 5,
+            dataPoints: dataPoints6              
+        }          
+        ]
+    });
+    chart.render();
+
+    var chart = new CanvasJS.Chart("chartContainer2", {
+        theme: "light2",
+        animationEnabled: true,
+        zoomEnabled: true,
+        title: {
+            text: "Patient Caregivers"
+        },   
+        toolTip: {
+            content: "{x} ; {y} ; {z}",
+        },  
+        axisY: {
+            // interval: 1,
+            label: "Caregivers",
+            minimum: mincgid-3,
+            maximum: maxcgid+3,
+        },
+        axisX: {
+            // interval: 1,
+            intervalType: "minute",
+            valueFormatString: "YYYY-MM-DD, HH:mm:ss",
+            labelMaxWidth: 100,
+        },
+        data: [
+        {
+            type: "stepLine",
+            lineThickness: 2,
+            markerType: "circle",
+            markerSize: 4,            
+            dataPoints: dataPoints3
+        }
+        ]
+    });
+    chart.render();          
+    });
+
+    function drugPatient(subjid, hadm, icustay, charttime, itemid, amount, amountuom){
+        this.SUBJECT_ID = subjid;
+        this.HADM_ID = hadm;
+        this.ICUSTAY_ID = icustay;
+        this.CHARTTIME = charttime;
+        this.ITEMID = itemid;
+        this.AMOUNT = amount;
+        this.AMOUNTUOM = amountuom;
+    }
+
+    Promise.all([
+        d3.csv("testInputEventsCV.csv", function(d) {
+            return {
+                SUBJECT_ID: +d.SUBJECT_ID,
+                HADM_ID: +d.HADM_ID,
+                ICUSTAY_ID: +d.ICUSTAY_ID,
+                // STARTTIME: d.STARTTIME,
+                // ENDTIME: d.ENDTIME,
+                CHARTTIME: d.CHARTTIME,
+                ITEMID: +d.ITEMID,
+                AMOUNT: +d.AMOUNT,
+                AMOUNTUOM: d.AMOUNTUOM,
+            }      
+        }),
+        d3.csv("24457.csv", function(d2) {
+            return {
+                SUBJECT_ID: +d2.SUBJECT_ID,
+                HADM_ID: +d2.HADM_ID,
+                ICUSTAY_ID: +d2.ICUSTAY_ID,
+            }
+        }),
+        d3.csv("D_ITEMS.csv", function(d3) {
+            return {
+                ITEMID: +d3.ITEMID,
+                LABEL: d3.LABEL,
+            }
+        }),
+    ]).then(function(files) {
+        subjID = files[1][1].SUBJECT_ID;
+        hadmID = files[1][1].HADM_ID;
+        icustayID = files[1][1].ICUSTAY_ID;
+        // console.log(icustayID);
+        // console.log(subjID);
+        // console.log(files[0][0].SUBJECT_ID);
+        for(var i = 0; i < files[0].length; i++) {
+            if(files[0][i].SUBJECT_ID == subjID && files[0][i].HADM_ID == hadmID && files[0][i].ICUSTAY_ID == icustayID) {
+                // console.log(files[0][i].ITEMID);
+                var ss3 = files[0][i].CHARTTIME
+                var dd3 = new Date(ss3);
+                drugPoints.push({ x: dd3, y: files[0][i].AMOUNT });
+                drugUnit = files[0][i].AMOUNTUOM;
+                // console.log(drugUnit);
+                for(var j = 0; j < files[2].length; j++) {
+                    if(files[0][i].ITEMID == files[2][j].ITEMID) {
+                        drugName = files[2][j].LABEL;
+                    }
+                }
+            }
+        }
+    var chart = new CanvasJS.Chart("chartContainer3", {
+        theme: "light2",
+        animationEnabled: true,
+        zoomEnabled: true,
+        title: {
+            text: "Patient Drugs"
+        },//x, y axes are swapped for rangebar
+        toolTip: {
+            content: "{x} ; {y} " + drugUnit
+        },
+        axisX: {
+            intervalType: "hour",
+            valueFormatString: "YYYY-MM-DD, HH:mm:ss",
+            labelMaxWidth: 100,
+        },
+        axisY: {
+            label: "Item IDs"
+        },
+        data: [
+        {
+            type: "line",
+            dataPoints: drugPoints,
+            showInLegend: true,
+            legendText: drugName + " (" + drugUnit + ")",
+            connectNullData: true,
+        }
+        ]
+    });
+    chart.render();
+    });
+});
+
+</script>
+</head>
+<body>
+    <script src ="faker.js-4.1.0/build/build/faker.js" type="text/javascript"></script>
+
+
+    <h1 align="center"><span id="patientName"></span></h1>
+
+<!-- <input type="text" id="input1" />
+<button onclick="myJsFunction()"></button> -->
+<!-- <script type="text/javascript">
+ function myJsFunction(){
+    var text=document.getElementById('input1').value;
+    console.log(text);
+ }
+</script> -->
+
+    <!-- <input type="button" value="Click me" onclick="getPatientCSV()"> -->
+
+<!--         <select multiple class="dropdown" id="dd">
+            <option value="" selected="selected">Select measurement by</option>
+            <option value="Heart Rate">Heart Rate</option>
+            <option value="Arterial bp mean">Arterial BP Mean</option>
+            <option value="TempC">TempC</option>
+            <option value="TempF">TempF</option>
+            <option value="Respiratory Rate">Respiratory Rate</option>
+        </select> -->
+
+        <table id="nametable" border="2" align="center">
+            <tr>
+                <th>Name</th>
+            </tr>
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+        <table id="table" border="1" align="center">
+            <tr>
+                <th>Subject ID</th>
+                <th>HADM ID</th>
+                <th>ICUSTAY ID</th>
+                <th>Diagnosis Code</th>
+                <th>Diagnosis Description</th>
+                <th>Diagnosis Type</th>
+                <th>DOB</th>
+                <th>DOD</th>
+                <th>Gender</th>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+        <br>
+        <br>
+        <br>
+        <br>
+        <script type="text/javascript">
+            var listName = [];
+            var name;
+            var csvFile;
+            var ext;
+            var withoutext;
+
+            function getPatientCSV() {
+                name = prompt("Enter a name OR a patient ID .csv file.");
+                dotIndex = name.lastIndexOf('.');
+                ext = name.substring(dotIndex);
+                withoutext = name.split('.').slice(0, -1).join('.');
+                console.log(withoutext);
+            }
+            getPatientCSV();
+
+
+
+            d3.csv("PATIENT_NAMES.csv", function(d) { //need to run python script first
+                return {
+                    PatientID: d.PatientID,
+                    Name: d.Name,
+                };
+            }).then(function(data) {
+                for(var i = 0; i < data.length; i++) {
+                    if(data[i].Name == name && ext != "csv") {
+                        csvFile = data[i].PatientID + ".csv"; 
+                        listName.push(name);                   
+                    }
+                    else if(ext == ".csv" && data[i].PatientID == withoutext) {
+                        csvFile = name;
+                        listName.push(data[i].Name);
+                    }                    
+                }//35: Crystal Young, 20: Nicole Hendrix
+                for(var i = 0; i < nametable.rows[1].cells.length; i++) {
+                    nametable.rows[1].cells[i].innerHTML = listName[i];
+                }            
+            })
+            // console.log(csvFile);
+        </script>        
+        <script src="https://d3js.org/d3.v5.min.js"></script> 
+
+        <script type="text/javascript"charset="utf-8">
+            var list = [];
+            var hadm;
+            Promise.all([
+                d3.csv(csvFile, function(d) {                 
+                    return {
+                        SUBJECT_ID: +d.SUBJECT_ID,
+                        HADM_ID: +d.HADM_ID,
+                        ICUSTAY_ID: +d.ICUSTAY_ID,                        
+                    };
+                }),
+                d3.csv("DRGCODES.csv", function(d2) {           
+                    return {
+                        HADM_ID: +d2.HADM_ID,
+                        DRG_TYPE: d2.DRG_TYPE,
+                        DRG_CODE: +d2.DRG_CODE,
+                        DESCRIPTION: d2.DESCRIPTION,                        
+                    }
+                }),
+                d3.csv("PATIENTS.csv", function(d3) {
+                    return {
+                        SUBJECT_ID: +d3.SUBJECT_ID,
+                        GENDER: d3.GENDER,
+                        DOB: d3.DOB,
+                        DOD: d3.DOD,
+                    }
+                })
+            ]).then(function(files) {
+                // console.log(files[0][1].SUBJECT_ID);
+                hadm = files[0][1].HADM_ID;
+                // console.log(hadm);
+                list.push(files[0][1].SUBJECT_ID);
+                list.push(files[0][1].HADM_ID);
+                list.push(files[0][1].ICUSTAY_ID);
+                for(var drugItr = 0; drugItr < files[1].length; drugItr++) {
+                    if(files[1][drugItr].HADM_ID == hadm) {
+                        list.push(files[1][drugItr].DRG_CODE)
+                        list.push(files[1][drugItr].DESCRIPTION)
+                        list.push(files[1][drugItr].DRG_TYPE);
+                    }
+                }
+                for(var patientItr = 0; patientItr < files[2].length; patientItr++) {
+                    if(files[0][1].SUBJECT_ID == files[2][patientItr].SUBJECT_ID) {
+                        list.push(files[2][patientItr].DOB);
+                        if(files[2][patientItr].DOD == 0) {
+                            list.push("N/A")
+                        }
+                        else {
+                        list.push(files[2][patientItr].DOD);
+                        }
+                        list.push(files[2][patientItr].GENDER);
+                    }
+                }              
+                for(var i = 0; i < table.rows[1].cells.length; i++) {
+                    table.rows[1].cells[i].innerHTML = list[i];
+                }
+            })
+        </script>
+    <div id="chartContainer" style="height: 500px; width: 100%;"></div>
+    <div id="chartContainer2" style="height: 500px; width: 100%;"></div>
+    <div id="chartContainer3" style="height: 500px; width: 100%;"></div>
+    <div id="basic"></div>
+   
+</body>
 </html>
